@@ -1,3 +1,6 @@
+#!/system/bin/sh
+MODDIR=${0%/*}
+sh $MODDIR/关闭转发.sh
 # 可选文件，因为有的模块是一次性的不需要卸载
 # 这个脚本将会在模块被卸载时运行
 
@@ -9,7 +12,7 @@
 
 # 示例：
 # 假设你的模块在 /data/local/tmp 创建了一些临时文件，你可以在这里删除它们：
-rm -rf /data/local/tmp/my_module_temp_files
+#rm -rf /data/local/tmp/my_module_temp_files
 
 # 如果你的模块启动了某些服务，你可以在这里停止它们：
 # 假设你的服务名为 my_module_service
@@ -20,3 +23,4 @@ rm -rf /data/local/tmp/my_module_temp_files
 # cp /data/local/tmp/original_hosts /system/etc/hosts
 
 # 请根据你的模块的具体需求来编写这个脚本。
+
