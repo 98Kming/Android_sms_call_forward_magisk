@@ -74,12 +74,10 @@ sendSms() {
     send_number=$(echo "$sms" | awk -F'|' '{print $2}')
     body=$(echo "$sms" | awk -F'|' '{print $3}')
     sub_id=$(echo "$sms" | awk -F'|' '{print $4}')
-    content=$(echo "$sms_format" | awk -v b="$body" -v s="$sub_id" -v n="$send_number" '{
-        gsub(/{body}/, b);
-        gsub(/{sub_id}/, s);
-        gsub(/{send_number}/, n);
-        print
-    }')
+    content="${sms_format//\{body\}/$body}"
+    content="${content//\{send_number\}/$send_number}"
+    content="${content//\{sub_id\}/$sub_id}"
+    content=$(echo "$content" | tr '\\\n' '\n')
     sendWebhook "$content"
     saveId "last_sms_id" $id
     sleep 2
@@ -93,14 +91,13 @@ sendCall() {
     if [[ ! -n "$call" ]]; then
       break;
     fi
+    call=$(echo "$call" | tr '\n' '\\\n')
     id=$(echo "$call" | awk -F'|' '{print $1}')
     my_number=$(echo "$call" | awk -F'|' '{print $2}')
     call_number=$(echo "$call" | awk -F'|' '{print $3}')
-    content=$(echo "$call_format" | awk -v b="$my_number" -v s="$call_number" '{
-        gsub(/{my_number}/, b);
-        gsub(/{call_number}/, s);
-        print
-    }')
+    content="${call_format//\{my_number\}/$my_number}"
+    content="${content//\{call_number\}/$call_number}"
+    content=$(echo "$content" | tr '\\\n' '\n')
     sendWebhook "$content"
     saveId "last_call_id" $id
     sleep 2
@@ -129,6 +126,7 @@ init() {
     fi
   fi
 }
+
 init $sms_enable $SMS_DB_PATH "SELECT _id FROM sms ORDER BY _id DESC LIMIT 1;" "last_sms_id" "sendSms"
 init $call_enable $CALL_DB_PATH "SELECT _id FROM calls ORDER BY _id DESC LIMIT 1;" "last_call_id" "sendCall"
 
