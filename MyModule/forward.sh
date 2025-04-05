@@ -69,10 +69,10 @@ sendSms() {
     if [[ ! -n "$sms" ]]; then
       break;
     fi
+    sms=$(echo "$sms" | tr '\n' '\\\n')
     id=$(echo "$sms" | awk -F'|' '{print $1}')
     send_number=$(echo "$sms" | awk -F'|' '{print $2}')
-    #body=$(echo "$sms" | awk -F'|' '{print $3}')
-    body="$sms"
+    body=$(echo "$sms" | awk -F'|' '{print $3}')
     sub_id=$(echo "$sms" | awk -F'|' '{print $4}')
     content=$(echo "$sms_format" | awk -v b="$body" -v s="$sub_id" -v n="$send_number" '{
         gsub(/{body}/, b);

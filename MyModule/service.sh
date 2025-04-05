@@ -27,9 +27,9 @@ do
     fi
   else
     if [ $run -eq 0 ] || [ $run -eq 2 ] ;then
+      log "模块启动，运行中"
       sh $MODDIR/开启转发.sh
       run=1
-      log "模块启动，运行中"
     fi
   fi
   sleep 5
