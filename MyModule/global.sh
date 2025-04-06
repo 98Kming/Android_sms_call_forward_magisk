@@ -1,7 +1,7 @@
 #!/system/bin/sh
 log() {
-  printf "%s\n" "$(date +%F_%T)_PID_$$ $1"
-  printf "%s\n" "$(date +%F_%T)_PID_$$ $1" >> "$MODDIR/log.log"
+  printf "%s\n" "$(date +%F_%T)_PID_$$: $1"
+  printf "%s\n" "$(date +%F_%T)_PID_$$: $1" >> "$MODDIR/log.log"
 }
 
 getAttr() {
@@ -49,15 +49,16 @@ sendSms() {
     if [[ ! -n "$sms" ]]; then
       break;
     fi
-    sms=$(echo "$sms" | tr '\n' '\\\n')
-    id=$(echo "$sms" | awk -F'|' '{print $1}')
-    send_number=$(echo "$sms" | awk -F'|' '{print $2}')
-    body=$(echo "$sms" | awk -F'|' '{print $3}')
-    sub_id=$(echo "$sms" | awk -F'|' '{print $4}')
+    IFS='|'
+    arr=($sms)
+    unset IFS
+    id="${arr[0]}"
+    send_number="${arr[1]}"
+    body="${arr[2]}"
+    sub_id="${arr[3]}"
     content="${sms_format//\{body\}/$body}"
     content="${content//\{send_number\}/$send_number}"
     content="${content//\{sub_id\}/$sub_id}"
-    content=$(echo "$content" | tr '\\\n' '\n')
     sendWebhook "$content"
     saveId "last_sms_id" $id
     sleep 2
@@ -71,10 +72,12 @@ sendCall() {
     if [[ ! -n "$call" ]]; then
       break;
     fi
-    call=$(echo "$call" | tr '\n' '\\\n')
-    id=$(echo "$call" | awk -F'|' '{print $1}')
-    my_number=$(echo "$call" | awk -F'|' '{print $2}')
-    call_number=$(echo "$call" | awk -F'|' '{print $3}')
+    IFS='|'
+    arr=($call)
+    unset IFS
+    id="${arr[0]}"
+    my_number="${arr[1]}"
+    call_number="${arr[2]}"
     content="${call_format//\{my_number\}/$my_number}"
     content="${content//\{call_number\}/$call_number}"
     content=$(echo "$content" | tr '\\\n' '\n')
@@ -125,6 +128,10 @@ checkConfigMod() {
   if [ $? == 1 ]; then
     mod=1
   fi
+  isMod "sms_db"
+  if [ $? == 1 ]; then
+    mod=1
+  fi
   isMod "call_enable"
   if [ $? == 1 ]; then
     mod=1
@@ -133,37 +140,14 @@ checkConfigMod() {
   if [ $? == 1 ]; then
     mod=1
   fi
+  isMod "call_db"
+  if [ $? == 1 ]; then
+    mod=1
+  fi
   isMod "webhook"
   if [ $? == 1 ]; then
     mod=1
   fi
   return $mod
-}
-
-listen() {
-  inotifyd - "$CALL_DB_PATH:c" "$SMS_DB_PATH:c" "$MODDIR:ndm" "$MODDIR/config.conf:cw" | while read -r event; do
-    # 监听目录时数组为(操作,路径,文件名) 监听文件时数组为(操作,路径+文件名)
-    local arr=($(echo "$event" | awk -F'	' '{print}'))
-    if [[ "${arr[1]}" == "$SMS_DB_PATH" && "$sms_enable" == 1  ]]; then
-      # 短信数据库修改
-      sendSms
-    fi
-    if [[ "${arr[1]}" == "$CALL_DB_PATH" && "$call_enable" == "1"  ]]; then
-       # 电话数据库修改
-      sendCall
-    fi
-    if [ "${arr[0]}" == "m" -a "${arr[2]}" == "config.conf" ] || [ "${arr[0]}" == "w" -a "${arr[1]}" == "$MODDIR/config.conf" ]; then
-      # 配置文件修改检查
-      checkConfigMod
-    fi
-    if [ "${arr[0]}" = "n" -a "${arr[2]}" = "disable" ]; then
-      log "模块被关闭"
-      log "$event"
-    fi
-    if [ "${arr[0]}" = "d" -a "${arr[2]}" = "disable" ]; then
-      log "模块被开启"
-      log "$event"
-    fi
-  done
 }
 
