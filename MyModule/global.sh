@@ -1,8 +1,4 @@
 #!/system/bin/sh
-log() {
-  printf "%s\n" "$(date +%F_%T)_PID_$$: $1"
-  printf "%s\n" "$(date +%F_%T)_PID_$$: $1" >> "$MODDIR/log.log"
-}
 
 getAttr() {
   local config_file="${MODDIR}/config.conf"
@@ -45,7 +41,7 @@ saveId() {
 sendSms() {
   while true; do
     local _id=$(eval echo "\$$1")
-    local sql="SELECT _id, address, body, sub_id FROM sms WHERE _id > $1 ORDER BY _id  LIMIT 1;"
+    local sql="SELECT _id, address, body, sub_id FROM sms WHERE _id > $_id ORDER BY _id  LIMIT 1;"
     local sms=$(exeSql $2 "$sql")
     if [[ ! -n "$sms" ]]; then
       break;
@@ -90,11 +86,6 @@ sendCall() {
 }
 
 init() {
-  local enable=$1
-  local db=$2
-  local lastSql=$3
-  local id_file=$4
-  local exec=$5
   if [[ $1 == 1 ]]; then
     waitLoadFile $2
     local id=$(exeSql $2 "$3")
@@ -106,7 +97,7 @@ init() {
       if [ $id -lt old_id ]; then
         log  "$4:数据库值较小，同步为数据库值"
         saveId "$4" "$id"
-      else
+      elif [ $id -gt old_id ]; then
         eval $4=$old_id
         eval "$5 $4 $2"
       fi

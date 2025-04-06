@@ -12,6 +12,9 @@ while [ -s $MODDIR/pid ]; do
     log "stop child pid:$child"
   done
   kill -9 $pid
+  if [ $? -ne 0 ]; then
+      log "kill pid:$?"
+  fi
   sed -i '1d' $MODDIR/pid
   log "stop pid:$pid"
 done
