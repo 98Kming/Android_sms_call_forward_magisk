@@ -9,4 +9,4 @@ MODDIR=${0%/*}
 
 chmod -R 755 $MODDIR
 
-sh $MODDIR/开启转发.sh 1>/dev/null 2>error.log
+sh $MODDIR/开启转发.sh 1>/dev/null 2>>"$MODDIR"/log.log

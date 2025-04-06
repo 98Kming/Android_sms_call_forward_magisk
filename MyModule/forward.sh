@@ -1,7 +1,7 @@
 #!/system/bin/sh
 MODDIR=${0%/*}
 
-$MODDIR/关闭转发.sh
+$MODDIR/关闭转发.sh 1>/dev/null 2>>"$MODDIR"/log.log
 
 . $MODDIR/global.sh
 

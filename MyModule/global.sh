@@ -2,7 +2,7 @@
 
 log() {
   printf "%s\n" "$(date +%F_%T)_PID_$$: $1"
-  printf "%s\n" "$(date +%F_%T)_PID_$$: $1" &> "$MODDIR/log.log"
+  printf "%s\n" "$(date +%F_%T)_PID_$$: $1" >> "$MODDIR/log.log"
 }
 
 getAttr() {
