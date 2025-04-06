@@ -1,5 +1,10 @@
 #!/system/bin/sh
 
+log() {
+  printf "%s\n" "$(date +%F_%T)_PID_$$: $1"
+  printf "%s\n" "$(date +%F_%T)_PID_$$: $1" &> "$MODDIR/log.log"
+}
+
 getAttr() {
   local config_file="${MODDIR}/config.conf"
   local value=$(grep "^$1=" "$config_file" | cut -d '=' -f 2-)

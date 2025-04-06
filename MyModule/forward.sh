@@ -1,12 +1,6 @@
 #!/system/bin/sh
 MODDIR=${0%/*}
 
-log() {
-  printf "%s\n" "$(date +%F_%T)_PID_$$: $1"
-  printf "%s\n" "$(date +%F_%T)_PID_$$: $1" &> "$MODDIR/log.log"
-}
-
-
 $MODDIR/关闭转发.sh
 
 . $MODDIR/global.sh
@@ -32,6 +26,8 @@ if [ "$sms_enable" != 1 -a "$call_enable" != 1 ]; then
   exit 0
 fi
 
+echo $$ >> $MODDIR/pid
+log "启动转发"
 if [ "$sms_enable" == 1 ];then
   init $sms_enable $sms_db "SELECT _id FROM sms ORDER BY _id DESC LIMIT 1;" "last_sms_id" "sendSms"
 fi
@@ -39,6 +35,8 @@ fi
 if [ "$call_enable" == 1 ];then
   init $call_enable $call_db "SELECT _id FROM calls ORDER BY _id DESC LIMIT 1;" "last_call_id" "sendCall"
 fi
+
+
 
 inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:m" "$MODDIR/config.conf:w" | while read -r event; do
   # 监听目录时数组为(操作,路径,文件名) 监听文件时数组为(操作,路径+文件名)

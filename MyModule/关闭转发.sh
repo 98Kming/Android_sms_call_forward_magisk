@@ -18,3 +18,4 @@ while [ -s $MODDIR/pid ]; do
   sed -i '1d' $MODDIR/pid
   log "stop pid:$pid"
 done
+log "关闭转发"
