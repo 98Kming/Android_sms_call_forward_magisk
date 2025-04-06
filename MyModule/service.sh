@@ -40,16 +40,16 @@ if [ "$call_enable" == 1 ];then
 fi
 
 listen() {
-  inotifyd - "$CALL_DB_PATH:c" "$SMS_DB_PATH:c" "$MODDIR:ndm" "$MODDIR/config.conf:cw" | while read -r event; do
+  inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:ndm" "$MODDIR/config.conf:cw" | while read -r event; do
     # 监听目录时数组为(操作,路径,文件名) 监听文件时数组为(操作,路径+文件名)
     arr=($(echo "$event" | awk -F'	' '{print}'))
-    if [[ "${arr[1]}" == "$SMS_DB_PATH" && "$sms_enable" == 1  ]]; then
+    if [[ "${arr[1]}" == "$sms_db" && "$sms_enable" == 1  ]]; then
       # 短信数据库修改
-      sendSms "$last_sms_id"
+      sendSms "$last_sms_id" $sms_db
     fi
-    if [[ "${arr[1]}" == "$CALL_DB_PATH" && "$call_enable" == "1"  ]]; then
+    if [[ "${arr[1]}" == "$call_db" && "$call_enable" == "1"  ]]; then
        # 电话数据库修改
-      sendCall "$last_call_id"
+      sendCall "$last_call_id" $call_db
     fi
     if [ "${arr[0]}" == "m" -a "${arr[2]}" == "config.conf" ] || [ "${arr[0]}" == "w" -a "${arr[1]}" == "$MODDIR/config.conf" ]; then
       # 配置文件修改检查

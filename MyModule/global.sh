@@ -44,6 +44,7 @@ saveId() {
 
 sendSms() {
   while true; do
+    local _id=$(eval echo "\$$1")
     local sql="SELECT _id, address, body, sub_id FROM sms WHERE _id > $1 ORDER BY _id  LIMIT 1;"
     local sms=$(exeSql $2 "$sql")
     if [[ ! -n "$sms" ]]; then
@@ -67,7 +68,8 @@ sendSms() {
 
 sendCall() {
   while true; do
-    local sql="SELECT _id, phone_account_address, number FROM calls where type=3 and _id > $1 ORDER BY _id LIMIT 1;"
+    local _id=$(eval echo "\$$1")
+    local sql="SELECT _id, phone_account_address, number FROM calls where type=3 and _id > $_id ORDER BY _id LIMIT 1;"
     local call=$(exeSql $2 "$sql")
     if [[ ! -n "$call" ]]; then
       break;
@@ -100,11 +102,12 @@ init() {
       log "$4:$id"
       saveId "$4" "$id"
     else
-      eval $4=$(head -n 1 $MODDIR/$4)
-      if [ $id -lt $4 ]; then
+      local old_id=$(head -n 1 $MODDIR/$4)
+      if [ $id -lt old_id ]; then
         log  "$4:数据库值较小，同步为数据库值"
         saveId "$4" "$id"
       else
+        eval $4=$old_id
         eval "$5 $4 $2"
       fi
     fi
@@ -135,6 +138,7 @@ checkConfigMod() {
   fi
   isMod "sms_db"
   if [ $? == 1 ]; then
+    chmod 666 "$sms_db"
     mod=1
   fi
   isMod "call_enable"
@@ -147,6 +151,7 @@ checkConfigMod() {
   fi
   isMod "call_db"
   if [ $? == 1 ]; then
+    chmod 666 "$call_db"
     mod=1
   fi
   isMod "webhook"
