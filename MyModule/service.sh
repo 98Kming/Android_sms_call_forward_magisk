@@ -45,11 +45,11 @@ listen() {
     arr=($(echo "$event" | awk -F'	' '{print}'))
     if [[ "${arr[1]}" == "$SMS_DB_PATH" && "$sms_enable" == 1  ]]; then
       # 短信数据库修改
-      sendSms
+      sendSms "$last_sms_id"
     fi
     if [[ "${arr[1]}" == "$CALL_DB_PATH" && "$call_enable" == "1"  ]]; then
        # 电话数据库修改
-      sendCall
+      sendCall "$last_call_id"
     fi
     if [ "${arr[0]}" == "m" -a "${arr[2]}" == "config.conf" ] || [ "${arr[0]}" == "w" -a "${arr[1]}" == "$MODDIR/config.conf" ]; then
       # 配置文件修改检查
