@@ -44,8 +44,8 @@ saveId() {
 
 sendSms() {
   while true; do
-    local sql="SELECT _id, address, body, sub_id FROM sms WHERE _id > $last_sms_id ORDER BY _id  LIMIT 1;"
-    local sms=$(exeSql $SMS_DB_PATH "$sql")
+    local sql="SELECT _id, address, body, sub_id FROM sms WHERE _id > $1 ORDER BY _id  LIMIT 1;"
+    local sms=$(exeSql $2 "$sql")
     if [[ ! -n "$sms" ]]; then
       break;
     fi
@@ -60,15 +60,15 @@ sendSms() {
     content="${content//\{send_number\}/$send_number}"
     content="${content//\{sub_id\}/$sub_id}"
     sendWebhook "$content"
-    saveId "last_sms_id" $id
+    saveId "$1" $id
     sleep 2
   done
 }
 
 sendCall() {
   while true; do
-    local sql="SELECT _id, phone_account_address, number FROM calls where type=3 and _id > $last_call_id ORDER BY _id LIMIT 1;"
-    local call=$(exeSql $CALL_DB_PATH "$sql")
+    local sql="SELECT _id, phone_account_address, number FROM calls where type=3 and _id > $1 ORDER BY _id LIMIT 1;"
+    local call=$(exeSql $2 "$sql")
     if [[ ! -n "$call" ]]; then
       break;
     fi
@@ -82,12 +82,17 @@ sendCall() {
     content="${content//\{call_number\}/$call_number}"
     content=$(echo "$content" | tr '\\\n' '\n')
     sendWebhook "$content"
-    saveId "last_call_id" $id
+    saveId "$1" $id
     sleep 2
   done
 }
 
 init() {
+  local enable=$1
+  local db=$2
+  local lastSql=$3
+  local id_file=$4
+  local exec=$5
   if [[ $1 == 1 ]]; then
     waitLoadFile $2
     local id=$(exeSql $2 "$3")
@@ -100,7 +105,7 @@ init() {
         log  "$4:数据库值较小，同步为数据库值"
         saveId "$4" "$id"
       else
-        eval $5
+        eval "$5 $4 $2"
       fi
     fi
   fi
