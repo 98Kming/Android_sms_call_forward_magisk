@@ -1,7 +1,7 @@
 id=teat-a
 name=teat-a
-version=3
-versionCode=2025040504
+version=2
+versionCode=2025040601
 author=teat-a
 description=teat-a
 updateJson=http://raw.githubusercontent.com/98Kming/Android_sms_call_forward_magisk/test/update.json
