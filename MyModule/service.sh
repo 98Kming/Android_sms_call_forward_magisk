@@ -1,36 +1,42 @@
 #!/system/bin/sh
-MODDIR=${0%/*}
-
-# 指定日志文件路径
-log() {
- echo "$(date +%F_%T) $1" >> "$MODDIR/log.log"
-}
-
 
 # 等待系统初始化完成
 until [ "$(getprop sys.boot_completed)" -eq 1 ] ; do
   sleep 5
 done
 
-chmod -R 777 $MODDIR
-chmod -R 777 /data/data/com.android.providers.telephony/databases
-chmod -R 777 /data/data/com.android.providers.contacts/databases
+MODDIR=${0%/*}
 
-run=2
-while true
-do
-  if [ -f $MODDIR/disable ] ;then
-    if [ $run -eq 1 ] ;then
-      sh $MODDIR/关闭转发.sh
-      run=0
-      log "模块已关闭，停止运行"
-    fi
-  else
-    if [ $run -eq 0 ] || [ $run -eq 2 ] ;then
-      log "模块启动，运行中"
-      sh $MODDIR/开启转发.sh
-      run=1
-    fi
-  fi
-  sleep 5
-done
+chomd 0755 $MODDIR
+
+. $MODDIR/global.sh
+pkill inotifyd
+webhook="$(getAttr webhook)"
+sms_enable="$(getAttr sms_enable)"
+sms_format="$(getAttr sms_format)"
+sms_db="$(getAttr sms_db)"
+call_enable=$(getAttr call_enable)
+call_format=$(getAttr call_format)
+call_db="$(getAttr call_db)"
+
+if [ -n $a ]; then
+  log "webhook 未配置，请到 config.conf 中配置webhook地址"
+  exit 0
+fi
+
+if [ "$sms_enable" != 1 -a "$call_enable" != 1 ]; then
+  log "短信及未接来电转发功能全部关闭，程序退出。请检查配置"
+  exit 0
+fi
+
+if [ "$sms_enable" == 1 ];then
+  init $sms_enable $sms_db "SELECT _id FROM sms ORDER BY _id DESC LIMIT 1;" "last_sms_id" "sendSms"
+fi
+
+if [ "$call_enable" == 1 ];then
+  init $call_enable $CALL_DB_PATH "SELECT _id FROM calls ORDER BY _id DESC LIMIT 1;" "last_call_id" "sendCall"
+fi
+
+listen
+
+log "启动成功"
