@@ -48,11 +48,11 @@ sendSms() {
     local _id=$(eval echo "\$$1")
     local sql="SELECT _id, address, body, sub_id FROM sms WHERE _id > $_id ORDER BY _id  LIMIT 1;"
     local sms=$(exeSql $2 "$sql")
-    if [[ ! -n "$sms" ]]; then
+    if [ -z "$sms" ]; then
       break;
     fi
     IFS='|'
-    arr=($sms)
+    eval "arr=($sms)"
     unset IFS
     id="${arr[0]}"
     send_number="${arr[1]}"
@@ -72,11 +72,11 @@ sendCall() {
     local _id=$(eval echo "\$$1")
     local sql="SELECT _id, phone_account_address, number FROM calls where type=3 and _id > $_id ORDER BY _id LIMIT 1;"
     local call=$(exeSql $2 "$sql")
-    if [[ ! -n "$call" ]]; then
+    if [ -z "$call" ]; then
       break;
     fi
     IFS='|'
-    arr=($call)
+    eval "arr=($call)"
     unset IFS
     id="${arr[0]}"
     my_number="${arr[1]}"
@@ -94,15 +94,15 @@ init() {
   if [[ $1 == 1 ]]; then
     waitLoadFile $2
     local id=$(exeSql $2 "$3")
-    if [ ! -f "$MODDIR/$4" ] || [ ! -s "$MODDIR/$4" ]; then
+    if [ ! -f "$MODDIR/$4" ] || [ -z $(head -n 1 $MODDIR/$4) ]; then
       log "$4:$id"
       saveId "$4" "$id"
     else
       local old_id=$(head -n 1 $MODDIR/$4)
-      if [ $id -lt old_id ]; then
+      if [ $id -lt $old_id ]; then
         log  "$4:数据库值较小，同步为数据库值"
         saveId "$4" "$id"
-      elif [ $id -gt old_id ]; then
+      elif [ $id -gt $old_id ]; then
         eval $4=$old_id
         eval "$5 $4 $2"
       fi

@@ -1,7 +1,7 @@
 #!/system/bin/sh
 MODDIR=${0%/*}
 
-$MODDIR/关闭转发.sh 1>/dev/null 2>>"$MODDIR"/log.log
+$MODDIR/关闭转发.sh 1>/dev/null 2>>"$MODDIR/log.log"
 
 . $MODDIR/global.sh
 
@@ -40,7 +40,7 @@ fi
 
 inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:m" "$MODDIR/config.conf:w" | while read -r event; do
   # 监听目录时数组为(操作,路径,文件名) 监听文件时数组为(操作,路径+文件名)
-  arr=($(echo "$event" | awk -F'	' '{print}'))
+  eval "arr=($event)"
   if [[ "${arr[1]}" == "$sms_db" && "$sms_enable" == 1  ]]; then
     # 短信数据库修改
     sendSms "last_sms_id" $sms_db
