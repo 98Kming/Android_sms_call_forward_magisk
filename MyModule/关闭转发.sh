@@ -2,7 +2,7 @@
 
 MODDIR=${0%/*}
 log() {
-  echo "$(date +%F_%T)_PID_$$: $1" >> "$MODDIR/log.log"
+  echo "$(date +%F_%T)_关闭转发_$$: $1" >> "$MODDIR/log.log"
 }
 
 while [ -s $MODDIR/pid ]; do
