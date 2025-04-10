@@ -1,9 +1,9 @@
-
+pid=$$
 log_output() {
-  local result="[$$ $(date +"%Y-%m-%d %H:%M:%S")]"
+  #local result="[$$ $(date +"%Y-%m-%d %H:%M:%S")]"
   while IFS= read -r line; do
-    echo "$result $line"
-    result=""
+    echo "[$pid $(date +"%Y-%m-%d %H:%M:%S")] $line"
+    #result=""
   done | tee -a $MODDIR/log.log
 }
 
@@ -16,5 +16,5 @@ logCmd() {
 }
 
 log() {
-  echo "$1" | log_output
+  echo "$1" 2>&1 | log_output
 }

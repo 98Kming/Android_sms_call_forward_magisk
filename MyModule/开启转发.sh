@@ -9,6 +9,8 @@ if [ ! -f "$MODDIR/disable" ]; then
 else
   log "模块被禁用"
 fi
+$MODDIR/关闭转发.sh
+. $MODDIR/config.ini
 echo $$ >> $MODDIR/pid
 inotifyd - "$MODDIR:nd" | while read -r event; do
   # 监听目录时数组为(操作,路径,文件名) 监听文件时数组为(操作,路径+文件名)

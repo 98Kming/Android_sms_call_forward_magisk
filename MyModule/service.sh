@@ -5,13 +5,15 @@ MODDIR=${0%/*}
 until [ "$(getprop sys.boot_completed)" -eq 1 ] ; do
   sleep 5
 done
-
+"$MODDIR/关闭转发.sh"
+. $MODDIR/config.ini
 chmod -R 755 $MODDIR
 echo $$ >> $MODDIR/pid
 
 . $MODDIR/log.sh
 cleanup() {
- $(log "pgrep -P $$ -f 'inotifyd'")
+  log "程序关闭"
+  logCmd "pgrep -P $$ -f 'inotifyd'"
 }
 
 trap cleanup EXIT
