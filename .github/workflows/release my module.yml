@@ -256,7 +256,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 提交模块并生成PR链接
-        if: env.DEBUG_MODE != 'true'
+        if: false
         run: |
           # 确保 modules 目录存在并进入
           if [ ! -d "modules" ]; then
@@ -349,7 +349,7 @@ jobs:
           echo "=================================="
 
       - name: 上传PR链接作为工件
-        if: env.DEBUG_MODE != 'true'
+        if: false
         uses: actions/upload-artifact@v4
         with:
           name: PR链接
