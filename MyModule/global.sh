@@ -53,10 +53,10 @@ loadId() {
 
   echo "数据库最大值：$id"
   # 找到id文件
-  if [ -f "$MODDIR"/"$id_file" ]; then
+  if [ -f "$MODDIR/$id_file" ]; then
     # 读取id文件中的值
     local old_id
-    old_id=$(head -n 1 "$MODDIR"/"$id_file")
+    old_id=$(head -n 1 "$MODDIR/$id_file")
     if [ "$old_id" -eq "$old_id" ] 2>/dev/null && [ "$old_id" -lt "$id" ]; then
       # id文件中的值小于数据库值，说明有新短信，执行通知
       id=$old_id

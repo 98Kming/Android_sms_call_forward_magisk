@@ -6,11 +6,11 @@ until [ "$(getprop sys.boot_completed)" -eq 1 ] ; do
   sleep 5
 done
 "$MODDIR/关闭转发.sh"
-. $MODDIR/config.ini
-chmod -R 755 $MODDIR
-echo $$ >> $MODDIR/pid
+. "$MODDIR/config.ini"
+chmod -R 755 "$MODDIR"
+echo $$ >> "$MODDIR/pid"
 
-. $MODDIR/log.sh
+. "$MODDIR/log.sh"
 cleanup() {
   log "程序关闭"
   logCmd "pgrep -P $$ -f 'inotifyd'"
@@ -19,6 +19,6 @@ cleanup() {
 trap cleanup EXIT
 
 #/data/adb/ksu/bin/busybox sh -o standalone script -q -c "$MODDIR/test.sh" /dev/null | awk -v ts="$timestamp" 'BEGIN{RS="^$"} {printf "[%s] %s\n", ts, $0; fflush()}' | tee -a $MODDIR/log.log
-logSh $MODDIR/test.sh
+logSh "$MODDIR/test.sh"
 #/system/bin/sh $MODDIR/test.sh 2>&1 2>&1 | awk -v ts="$timestamp" 'BEGIN{RS="^$"} {printf "[%s] %s\n", ts, $0}' | tee $MODDIR/log.log
 

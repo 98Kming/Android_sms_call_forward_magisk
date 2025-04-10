@@ -8,12 +8,12 @@ call_db=""
 call_format=""
 
 webhook=""
-. "$MODDIR"/config.ini
+. "$MODDIR/config.ini"
 
 sms_init_sql="SELECT _id FROM sms ORDER BY _id DESC LIMIT 1;"
 call_init_sql="SELECT _id FROM calls ORDER BY _id DESC LIMIT 1;"
-. "$MODDIR"/global.sh
-echo $$ >> "$MODDIR"/pid
+. "$MODDIR/global.sh"
+echo $$ >> "$MODDIR/pid"
 echo "程序运行中..."
 loadId "last_sms_id" "$sms_db" "$sms_init_sql"
 loadId "last_call_id" "$call_db" "$call_init_sql"
@@ -78,7 +78,7 @@ sendCall() {
 }
 
 check() {
-  if [ "$sms_enable" != 1 ] && [ "$call_enable" != 1 ]; then
+  if [ "$sms_enable" -ne 1 ] && [ "$call_enable" -ne 1 ]; then
     echo "短信及未接来电转发功能全部关闭，请检查配置"
   elif [ -z "$webhook" ]; then
     echo "webhook 未配置，请到 config.conf 中配置webhook地址"
@@ -93,10 +93,10 @@ check
 inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:m" "$MODDIR/config.ini:w" | while read -r event; do
   arg2=$(echo "$event" | cut -f2)
   arg3=$(echo "$event" | cut -f3)
-  if [ "$arg2" = "$sms_db" ] && [ "$sms_enable" = 1 ]; then
+  if [ "$arg2" = "$sms_db" ] && [ "$sms_enable" -eq 1 ]; then
     # 短信数据库修改
     sendSms
-  elif [ "$arg2" = "$call_db" ] && [ "$call_enable" = "1" ]; then
+  elif [ "$arg2" = "$call_db" ] && [ "$call_enable" -eq 1 ]; then
     # 电话数据库修改
     sendCall
   elif [ "$arg3" = "config.ini" ] || [ "$arg2" = "$MODDIR/config.ini" ]; then
