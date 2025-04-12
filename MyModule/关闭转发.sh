@@ -6,6 +6,6 @@ while [ -s "$MODDIR/pid" ]; do
   sed -i '1d' "$MODDIR/pid"
   log "stop pid:$pid"
 done
-if [ -f "$MODDIR/disable" ]; then
-  rm "$MODDIR/disable"
+if [ ! -f "$MODDIR/disable" ]; then
+  touch "$MODDIR/disable"
 fi

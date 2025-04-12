@@ -16,13 +16,13 @@ if [ -f "$MODDIR/disable" ]; then
   disable=true
 fi
 enableSms() {
-  if  $sms_enable ||  $disable;then
+  if  $sms_enable || $disable;then
     return 1;
   fi
 }
 
 enableCall() {
-  if  $sms_enable ||  $disable;then
+  if  $sms_enable || $disable;then
     return 1;
   fi
 }
@@ -88,9 +88,10 @@ sendCall() {
 }
 
 check() {
-  if [ "$sms_enable" -ne 1 ] && [ "$call_enable" -ne 1 ]; then
+  (enableSms && enableCall) || {
     echo "短信及未接来电转发功能全部关闭，请检查配置"
-  elif [ -z "$webhook" ]; then
+  }
+  if [ -z "$webhook" ]; then
     echo "webhook 未配置，请到 config.conf 中配置webhook地址"
   else
     sendSms
@@ -104,10 +105,10 @@ inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:mnd" "$MODDIR/config.ini:w" | while
   arg1=$(echo "$event" | cut -f1)
   arg2=$(echo "$event" | cut -f2)
   arg3=$(echo "$event" | cut -f3)
-  if [ "$arg1" = "n" ] && [ "$arg1" = "disable" ]; then
+  if [ "$arg1" = "n" ] && [ "$arg3" = "disable" ]; then
     echo "检测到模块被禁用"
     disable=true
-  elif [ "$arg1" = "d" ] && [ "$arg1" = "disable" ]; then
+  elif [ "$arg1" = "d" ] && [ "$arg3" = "disable" ]; then
     echo "检测到模块被启用"
     disable=false
   elif [ "$arg2" = "$sms_db" ] && [ "$sms_enable" -eq 1 ]; then

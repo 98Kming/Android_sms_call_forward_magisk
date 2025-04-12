@@ -3,7 +3,12 @@ MODDIR=${0%/*}
 until [ "$(getprop sys.boot_completed)" -eq 1 ] ; do
   sleep 5
 done
-"$MODDIR/关闭转发.sh"
+while [ -s "$MODDIR/pid" ]; do
+  pid=$(head -n 1 "$MODDIR/pid")
+  pkill -9 -P "$pid" -f 'inotifyd'
+  sed -i '1d' "$MODDIR/pid"
+  log "stop pid:$pid"
+done
 . "$MODDIR/config.ini"
 chmod -R 755 "$MODDIR"
 echo $$ >> "$MODDIR/pid"
