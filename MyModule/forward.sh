@@ -1,6 +1,6 @@
 MODDIR=${0%/*}
 
-webhook=""
+
 . "$MODDIR/config.ini"
 
 sms_init_sql="SELECT _id FROM sms ORDER BY _id DESC LIMIT 1;"
@@ -11,10 +11,27 @@ echo "程序运行中..."
 loadId "last_sms_id" "$sms_db" "$sms_init_sql"
 loadId "last_call_id" "$call_db" "$call_init_sql"
 
-sendSms() {
-  if [ "$sms_enable" -ne 1 ];then
-    return 0;
+disable=false
+if [ -f "$MODDIR/disable" ]; then
+  disable=true
+fi
+enableSms() {
+  if  $sms_enable ||  $disable;then
+    return 1;
   fi
+}
+
+enableCall() {
+  if  $sms_enable ||  $disable;then
+    return 1;
+  fi
+}
+
+sendSms() {
+  enableSms || {
+    return 0
+  }
+
   while true; do
     if [ -z "$last_sms_id" ]; then
       loadId "last_sms_id" "$sms_db" "$sms_init_sql" || {
@@ -43,9 +60,9 @@ sendSms() {
 }
 
 sendCall() {
-  if [ "$call_enable" -ne 1 ];then
-      return 0;
-  fi
+  enableCall || {
+    return 0
+  }
   while true; do
     if [ -z "$last_call_id" ]; then
       loadId "last_call_id" "$call_db" "$call_init_sql" || {
@@ -83,16 +100,23 @@ check() {
 check
 
 # 监听目录时数组为(操作,路径,文件名) 监听文件时数组为(操作,路径+文件名)
-inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:m" "$MODDIR/config.ini:w" | while read -r event; do
+inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:mnd" "$MODDIR/config.ini:w" | while read -r event; do
+  arg1=$(echo "$event" | cut -f1)
   arg2=$(echo "$event" | cut -f2)
   arg3=$(echo "$event" | cut -f3)
-  if [ "$arg2" = "$sms_db" ] && [ "$sms_enable" -eq 1 ]; then
+  if [ "$arg1" = "n" ] && [ "$arg1" = "disable" ]; then
+    echo "检测到模块被禁用"
+    disable=true
+  elif [ "$arg1" = "d" ] && [ "$arg1" = "disable" ]; then
+    echo "检测到模块被启用"
+    disable=false
+  elif [ "$arg2" = "$sms_db" ] && [ "$sms_enable" -eq 1 ]; then
     # 短信数据库修改
     sendSms
   elif [ "$arg2" = "$call_db" ] && [ "$call_enable" -eq 1 ]; then
     # 电话数据库修改
     sendCall
-  elif [ "$arg3" = "config.ini" ] || [ "$arg2" = "$MODDIR/config.ini" ]; then
+  elif [ "$arg1" = "m" ] && [ "$arg3" = "config.ini" ] || [ "$arg2" = "$MODDIR/config.ini" ]; then
     echo "检测到配置修改"
     . "$MODDIR"/config.ini
     chmod 666 "$sms_db"
