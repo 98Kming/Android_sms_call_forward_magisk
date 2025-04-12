@@ -111,10 +111,10 @@ inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:mnd" "$MODDIR/config.ini:w" | while
   elif [ "$arg1" = "d" ] && [ "$arg3" = "disable" ]; then
     echo "检测到模块被启用"
     disable=false
-  elif [ "$arg2" = "$sms_db" ] && [ "$sms_enable" -eq 1 ]; then
+  elif [ "$arg2" = "$sms_db" ]; then
     # 短信数据库修改
     sendSms
-  elif [ "$arg2" = "$call_db" ] && [ "$call_enable" -eq 1 ]; then
+  elif [ "$arg2" = "$call_db" ]; then
     # 电话数据库修改
     sendCall
   elif [ "$arg1" = "m" ] && [ "$arg3" = "config.ini" ] || [ "$arg2" = "$MODDIR/config.ini" ]; then

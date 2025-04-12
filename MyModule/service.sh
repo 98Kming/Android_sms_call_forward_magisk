@@ -3,20 +3,40 @@ MODDIR=${0%/*}
 until [ "$(getprop sys.boot_completed)" -eq 1 ] ; do
   sleep 5
 done
-while [ -s "$MODDIR/pid" ]; do
-  pid=$(head -n 1 "$MODDIR/pid")
-  pkill -9 -P "$pid" -f 'inotifyd'
-  sed -i '1d' "$MODDIR/pid"
-  log "stop pid:$pid"
-done
-. "$MODDIR/config.ini"
 chmod -R 755 "$MODDIR"
-echo $$ >> "$MODDIR/pid"
 
+rm "$MODDIR/log.log"
 . "$MODDIR/log.sh"
+
+while [ -s "$MODDIR/pid" ]; do
+  _pid=$(tail -n 1 "$MODDIR/pid")
+  pkill -9 -P "$_pid" -f 'inotifyd'
+  sed -i '1d' "$MODDIR/pid"
+  log "stop pid:$_pid"
+done
+
+echo $$ >> "$MODDIR/pid"
+. "$MODDIR/config.ini"
+
+if [ -f "$MODDIR/disable" ]; then
+  rm "$MODDIR/disable"
+fi
+
 cleanup() {
-  log "程序关闭"
   logCmd "pgrep -P $$ -f 'inotifyd'"
+#  # 检查子进程 PID 是否存在
+#  if [ -n "$child_pid" ]; then
+#    # 向子进程发送终止信号
+#    kill "$child_pid"
+#    # 等待子进程结束
+#    log "结束子进程:$child_pid"
+#    sed -i "/^$child_pid$/d" "$MODDIR/pid"
+#    wait "$child_pid"
+#  fi
+#  sed -i "/^$pid$/d" "$MODDIR/pid"
+  log "程序退出"
+#  # 退出父进程
+#  exit 0
 }
 
 trap cleanup EXIT
