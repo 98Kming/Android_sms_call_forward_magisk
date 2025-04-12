@@ -1,7 +1,7 @@
 id=sms_call_forward_dev
 name=消息转发
-version=0.0.2
-versionCode=2025041201
+version=0.0.3
+versionCode=2025041202
 author=kming
 description=通过webhook转发未接来电及短信
 updateJson=http://raw.githubusercontent.com/98Kming/Android_sms_call_forward_magisk/dev/update.json
