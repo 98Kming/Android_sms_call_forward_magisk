@@ -247,7 +247,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.version }}
-          name: "${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }} 模块现已发布"
+          name: "${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }} 模块现已发布"
           body_path: CHANGELOG.md
           files: |
             ${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip
