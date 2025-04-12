@@ -102,8 +102,15 @@ check
 
 # 监听目录时数组为(操作,路径,文件名) 监听文件时数组为(操作,路径+文件名)
 inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:mnd" "$MODDIR/config.ini:w" | while read -r event; do
-  arg1=$(echo "$event" | cut -f1)
   arg2=$(echo "$event" | cut -f2)
+  if [ "$arg2" = "$sms_db" ]; then
+      # 短信数据库修改
+      sendSms
+  elif [ "$arg2" = "$call_db" ]; then
+      # 电话数据库修改
+      sendCall
+  fi
+  arg1=$(echo "$event" | cut -f1)
   arg3=$(echo "$event" | cut -f3)
   if [ "$arg1" = "n" ] && [ "$arg3" = "disable" ]; then
     echo "检测到模块被禁用"
@@ -111,11 +118,7 @@ inotifyd - "$sms_db:c" "$call_db:c" "$MODDIR:mnd" "$MODDIR/config.ini:w" | while
   elif [ "$arg1" = "d" ] && [ "$arg3" = "disable" ]; then
     echo "检测到模块被启用"
     disable=false
-  elif [ "$arg2" = "$sms_db" ]; then
-    # 短信数据库修改
     sendSms
-  elif [ "$arg2" = "$call_db" ]; then
-    # 电话数据库修改
     sendCall
   elif [ "$arg1" = "m" ] && [ "$arg3" = "config.ini" ] || [ "$arg2" = "$MODDIR/config.ini" ]; then
     echo "检测到配置修改"
