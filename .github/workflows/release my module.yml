@@ -185,7 +185,7 @@ jobs:
             {
               "version": "${{ env.version }}",
               "versionCode": "${{ env.versionCode }}",
-              "zipUrl": "${{ env.repo_url }}/releases/download/${{ env.version }}/${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip",
+              "zipUrl": "${{ env.repo_url }}/releases/download/${{ env.version }}/${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip",
               "changelog": "${{ env.repo_url }}/raw/${{ github.ref_name }}/CHANGELOG.md",
               "description": "${{ env.description }}"
             }
@@ -228,18 +228,18 @@ jobs:
           cd MyModule
           # 确保当前目录存在文件
           ls -la
-          zip -r "../${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip" ./*
+          zip -r "../${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip" ./*
           cd .. 
           # 验证压缩包
           echo "已创建模块压缩包:"
-          ls -lh "${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip"
+          ls -lh "${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip"
 
       - name: 调试模式 - 上传模块作为工作流构建工件
         if: env.DEBUG_MODE == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}
-          path: ${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip
+          name: ${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}
+          path: ${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip
           retention-days: 7
 
       - name: Create GitHub Release 发布模块
@@ -247,10 +247,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.version }}
-          name: "${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }} 模块现已发布"
+          name: "${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }} 模块现已发布"
           body_path: CHANGELOG.md
           files: |
-            ${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip
+            ${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip
           generate_release_notes: false # 使用changeloge.md的内容
           fail_on_unmatched_files: false  # 如果文件匹配失败不会导致工作流失败
         env:
@@ -307,7 +307,7 @@ jobs:
           
           # 复制模块到对应ID文件夹
           echo "复制模块文件..."
-          cp "../${{ env.name }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip" "$MODULE_DIR/"
+          cp "../${{ env.id }}-${{ env.version }}-${{ env.versionCode }}-by${{ env.author }}.zip" "$MODULE_DIR/"
           
           # 创建或更新模块信息文件
           echo "创建模块信息文件..."
