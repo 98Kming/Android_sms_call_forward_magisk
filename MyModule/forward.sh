@@ -7,6 +7,13 @@ sms_init_sql="SELECT _id FROM sms ORDER BY _id DESC LIMIT 1;"
 call_init_sql="SELECT _id FROM calls ORDER BY _id DESC LIMIT 1;"
 . "$MODDIR/global.sh"
 echo $$ >> "$MODDIR/pid"
+# 等待屏幕解锁，数据分区解锁
+while true; do
+  dumpsys window policy | grep "mInputRestricted=" | grep "true" || {
+    break
+  }
+  sleep 6
+done
 echo "程序运行中..."
 loadId "last_sms_id" "$sms_db" "$sms_init_sql"
 loadId "last_call_id" "$call_db" "$call_init_sql"

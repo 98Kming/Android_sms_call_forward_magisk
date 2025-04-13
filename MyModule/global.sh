@@ -43,7 +43,7 @@ loadId() {
   local id_file="$1"
   local db_path="$2"
   local sql="$3"
-  waitLoadFile "$db_path"
+  #waitLoadFile "$db_path"
   # 读取数据库最新id
   id=$(sqlite3 "$db_path" "$sql") || {
     echo "数据库查询失败"
