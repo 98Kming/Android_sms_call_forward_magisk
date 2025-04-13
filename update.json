@@ -1,7 +1,7 @@
 {
-  "version": "0.0.1",
-  "versionCode": "2025041203",
-  "zipUrl": "https://github.com/98Kming/Android_sms_call_forward_magisk/releases/download/0.0.1/sms_call_forward_dev-0.0.1-2025041203-bykming.zip",
+  "version": "0.0.2",
+  "versionCode": "2025041301",
+  "zipUrl": "https://github.com/98Kming/Android_sms_call_forward_magisk/releases/download/0.0.2/sms_call_forward_dev-0.0.2-2025041301-bykming.zip",
   "changelog": "https://github.com/98Kming/Android_sms_call_forward_magisk/raw/dev/CHANGELOG.md",
   "description": "通过webhook转发未接来电及短信"
 }
