@@ -1,7 +1,6 @@
 {
-  "version": "0.0.1",
-  "versionCode": "2025041203",
-  "zipUrl": "https://github.com/98Kming/Android_sms_call_forward_magisk/releases/download/0.0.1/sms_call_forward_dev-0.0.1-2025041203-bykming.zip",
-  "changelog": "https://github.com/98Kming/Android_sms_call_forward_magisk/raw/dev/CHANGELOG.md",
-  "description": "通过webhook转发未接来电及短信"
+  "version": "0.0.0",
+  "versionCode": "2025041601",
+  "zipUrl": "https://github.com/98Kming/Android_sms_call_forward_magisk/releases/download/0.0.0/docker-0.0.0-2025041601-bykming.zip",
+  "changelog": "https://github.com/98Kming/Android_sms_call_forward_magisk/raw/oneplus_5_docker/CHANGELOG.md"
 }
