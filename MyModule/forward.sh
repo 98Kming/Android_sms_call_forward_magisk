@@ -57,6 +57,7 @@ sendSms() {
     sub_id=$(echo "$sms" | cut -d'|' -f3)
     sql="SELECT body FROM sms WHERE _id = $id ORDER BY _id LIMIT 1;"
     body=$(sqlite3 "$sms_db" "$sql")
+    body="${body//\"/\\\"}"
     content="${sms_format//\{body\}/$body}"
     content="${content//\{send_number\}/$send_number}"
     content="${content//\{sub_id\}/$sub_id}"
